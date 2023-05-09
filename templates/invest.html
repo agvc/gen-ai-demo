@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="container mt-4">
+    <!-- Chat section -->
+    <div class="row">
+      <div class="col-md-12">
+        <form id="chatForm" method="post" action="/chat">
+          <div class="form-group">
+            <label for="userInput">Pergunta:</label>
+            <input type="text" class="form-control" name="userInput" id="userInput" placeholder="Ex: Qual o patrimônio líquido do Privilege DI?">
+          </div>
+          <div class="form-group">
+            <label for="apiResponse">Resposta:</label>
+            <textarea class="form-control" id="apiResponse" rows="3" placeholder="Resposta API" readonly></textarea>
+          </div>
+          <button type="submit" id="sendMessage" class="btn btn-primary">Send Message</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Table section -->
+<!-- Table section -->
+<div class="row mt-4">
+  <div class="col-md-12">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Nome</th>
+          <th scope="col">Taxa Adm</th>
+          <th scope="col">Categoria</th>
+          <th scope="col">Rendimento no ano</th>
+          <th scope="col">Rendimento 12 meses</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in data %}
+          <tr>
+            <td>{{ item.Nome }}</td>
+            <td>{{ item['Taxa Adm'] }}</td>
+            <td>{{ item.Categoria }}</td>
+            <td>{{ item['Rendimento no ano'] }}</td>
+            <td>{{ item['Rendimento 12 meses'] }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+  </div>
+
+  <script>
+    document.getElementById('chatForm').addEventListener('submit', async function (event) {
+      // Prevent the default form submit behavior
+      event.preventDefault();
+
+      const userInput = document.getElementById('userInput');
+      const apiResponse = document.getElementById('apiResponse');
+
+      const response = await fetch('/chat_api', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message: userInput.value })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        apiResponse.value = data.response;
+      } else {
+        apiResponse.value = 'Error: Unable to get response from API';
+      }
+    });
+  </script>
+{% endblock %}
